@@ -50,13 +50,13 @@ instructions.
   For Java result types:
   
   ```
-  npm run --prefix query-gen generate-queries -- --sqlDir=../src/generated/sql --javaBaseDir=../src/generated/lib -javaPkg=javapkg # --javaResultTypesHeader=...
+  npm run --prefix query-gen generate-queries -- --sqlDir=../src/generated/sql --javaBaseDir=../src/generated/lib -javaQueriesPkg=gen.queries -javaRelMdsPkg=gen.relmds # --javaResultTypesHeader=...
   ```
 
   For TypeScript result types:
   
   ```
-  npm run --prefix query-gen generate-queries -- --sqlDir=../src/generated/sql --tsDir=../src/generated/lib --tsTypesHeader=queries/result-types-header-ts
+  npm run --prefix query-gen generate-queries -- --sqlDir=../src/generated/sql --tsQueriesDir=../src/generated/lib --tsRelMdsDir=../src/generated/lib --tsTypesHeader=queries/result-types-header-ts
   ```
 
   The java/tsTypesHeader parameters are not required, but can be used in case additional imports
