@@ -7,7 +7,7 @@
 import * as minimist from 'minimist';
 import * as path from 'path';
 import {promises as fs} from 'fs';
-import {generateQuerySources, generateRelationsMetadataSource, SourceGenerationOptions} from 'sqljson-query';
+import {generateQuerySources, generateRelationsMetadataSource} from 'sqljson-query';
 
 import {queryGroupSpec} from './queries/query-specs';
 
