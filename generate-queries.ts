@@ -2,7 +2,7 @@
    It generates SQL, TS and/or Java sources for the queries specified in the query-specs.ts file,
    with options and output file locations as specified by the input arguments.
    Example usage generating SQL and both Java and TS source files:
-      node generate-queries --sqlDir=../src/generated/sql --tsDir=../src/generated/lib --tsTypesHeader=result-types-header-ts --javaBaseDir=../src/generated/lib --javaPkg=javapkg",
+      node generate-queries --sqlDir=../src/generated/sql --tsDir=../src/generated/lib --tsTypesHeader=result-types-header-ts --javaBaseDir=../src/generated/lib --javaQueriesPkg=my.queries--javaRelMdsPkg=my.relmds",
  */
 import * as minimist from 'minimist';
 import * as path from 'path';
@@ -11,63 +11,82 @@ import {generateQuerySources, generateRelationsMetadataSource, SourceGenerationO
 
 import {queryGroupSpec} from './queries/query-specs';
 
-const optionNames = ['sqlDir','tsDir','tsTypesHeader','javaBaseDir','javaPkg','javaTypesHeader'];
+const optionNames = [
+  'sqlDir',
+  'tsQueriesDir', 'tsRelMdsDir', 'tsTypesHeader',
+  'javaBaseDir', 'javaQueriesPkg', 'javaRelMdsPkg', 'javaTypesHeader'
+];
 const parsedArgs = parseArgs(process.argv, [], optionNames, 0);
 
 async function go()
 {
   if ( typeof parsedArgs === 'string' ) { console.error(`Error: ${parsedArgs}`); throw new Error(parsedArgs); }
 
-  console.log(parsedArgs);
-
   const dbmdPath = path.join(__dirname, 'dbmd', 'dbmd.json');
-  const sqlOutputDir: string | null = parsedArgs['sqlDir'];
+  console.log(`Using database metadata from ${dbmdPath}.`);
 
-  console.log(`Using database metadata from '${dbmdPath}'`);
-
+  // Generate SQL source files if specified.
+  const sqlOutputDir = parsedArgs['sqlDir'];
   if ( sqlOutputDir )
   {
-    await fs.mkdir(sqlOutputDir, { recursive: true });
-    console.log(`SQL files will be written to ${sqlOutputDir}.`);
+    await fs.mkdir(sqlOutputDir, {recursive: true});
+
+    console.log(`Writing SQL files to ${sqlOutputDir}.`);
+
+    await generateQuerySources(queryGroupSpec, dbmdPath, null, sqlOutputDir, {});
   }
 
-  // Generate TS sources if specified.
-  const tsOutputDir = parsedArgs['tsDir'];
-  if ( tsOutputDir )
+  // Generate TS query/result-type source files if specified.
+  const tsQueriesOutputDir = parsedArgs['tsQueriesDir'];
+  if ( tsQueriesOutputDir )
   {
-    await fs.mkdir(tsOutputDir, { recursive: true });
+    await fs.mkdir(tsQueriesOutputDir, {recursive: true});
 
-    console.log(`Writing TS source files to ${tsOutputDir}.`);
+    console.log(`Writing TS source files to ${tsQueriesOutputDir}.`);
 
-    const tsOpts: SourceGenerationOptions = {
+    await generateQuerySources(queryGroupSpec, dbmdPath, tsQueriesOutputDir, null, {
       sourceLanguage: 'TS',
       typesHeaderFile: parsedArgs['tsTypesHeader'] || undefined
-    };
+    });
+  }
 
-    await generateQuerySources(queryGroupSpec, dbmdPath, tsOutputDir, sqlOutputDir, tsOpts);
-    await generateRelationsMetadataSource(dbmdPath, tsOutputDir, 'TS');
+  const tsRelMdsOutputDir = parsedArgs['tsRelMdsDir'];
+  if ( tsRelMdsOutputDir )
+  {
+    console.log(`Writing TS relation metadatas source file to ${tsRelMdsOutputDir}.`);
+
+    await generateRelationsMetadataSource(dbmdPath, tsRelMdsOutputDir, 'TS');
   }
 
   // Generate Java sources if specified.
-  const javaOutputBaseDir = parsedArgs['javaBaseDir'];
-  if ( javaOutputBaseDir )
+  const javaBaseDir = parsedArgs['javaBaseDir'];
+  if ( javaBaseDir )
   {
-    const javaPackage = parsedArgs['javaPkg'];
-    const javaOutputDir = `${javaOutputBaseDir}/${replaceAll(javaPackage, '.','/')}`;
+    const javaQueriesPackage = parsedArgs['javaQueriesPkg'];
+    const javaQueriesOutputDir = `${javaBaseDir}/${replaceAll(javaQueriesPackage, '.','/')}`;
 
-    await fs.mkdir(javaOutputDir, { recursive: true });
+    await fs.mkdir(javaQueriesOutputDir, {recursive: true});
 
-    console.log(`Writing Java source files to ${javaOutputDir}.`);
+    console.log(`Writing Java query source files to ${javaQueriesOutputDir}.`);
 
-    const javaOpts: SourceGenerationOptions = {
+    await generateQuerySources(queryGroupSpec, dbmdPath, javaQueriesOutputDir, null, {
       sourceLanguage: 'Java',
-      javaPackage,
+      javaPackage: javaQueriesPackage,
       typesHeaderFile: parsedArgs['javaTypesHeader']
-    };
+    });
 
-    const maybeSqlOutputDir = tsOutputDir != null ? null : sqlOutputDir; // avoid writing SQL again if already written for TS
-    await generateQuerySources(queryGroupSpec, dbmdPath, javaOutputDir, maybeSqlOutputDir, javaOpts);
-    await generateRelationsMetadataSource(dbmdPath, javaOutputDir, 'Java', javaPackage);
+    // Write Java relation metadatas if specified.
+    const javaRelMdsPackage = parsedArgs['javaRelMdsPkg'];
+    if ( javaRelMdsPackage )
+    {
+      const javaRelMdsOutputDir = `${javaBaseDir}/${replaceAll(javaRelMdsPackage, '.','/')}`;
+
+      await fs.mkdir(javaRelMdsOutputDir, {recursive: true});
+
+      console.log(`Writing Java relations metadata file to ${javaRelMdsOutputDir}.`);
+
+      await generateRelationsMetadataSource(dbmdPath, javaRelMdsOutputDir, 'Java', javaRelMdsPackage);
+    }
   }
 }
 
