@@ -27,7 +27,15 @@ async function go()
 
   // Generate SQL source files if specified.
   const sqlOutputDir = parsedArgs['sqlDir'];
-  if ( sqlOutputDir )
+  const tsQueriesOutputDir = parsedArgs['tsQueriesDir'];
+  const javaBaseDir = parsedArgs['javaBaseDir'];
+  const javaQueriesPackage = parsedArgs['javaQueriesPkg'];
+  const javaQueriesOutputDir = javaBaseDir ? `${javaBaseDir}/${replaceAll(javaQueriesPackage, '.','/')}` : null;
+
+  // Only generate SQL here if it's not being generated with Java or TS source code below.
+  // The Java/TS source generators need to generate the SQL when they are enabled, so that they can
+  // reference the generated SQL resources within their source code.
+  if ( sqlOutputDir && !tsQueriesOutputDir && !javaQueriesOutputDir )
   {
     await fs.mkdir(sqlOutputDir, {recursive: true});
 
@@ -37,14 +45,13 @@ async function go()
   }
 
   // Generate TS query/result-type source files if specified.
-  const tsQueriesOutputDir = parsedArgs['tsQueriesDir'];
   if ( tsQueriesOutputDir )
   {
     await fs.mkdir(tsQueriesOutputDir, {recursive: true});
 
     console.log(`Writing TS source files to ${tsQueriesOutputDir}.`);
 
-    await generateQuerySources(queryGroupSpec, dbmdPath, tsQueriesOutputDir, null, {
+    await generateQuerySources(queryGroupSpec, dbmdPath, tsQueriesOutputDir, sqlOutputDir, {
       sourceLanguage: 'TS',
       typesHeaderFile: parsedArgs['tsTypesHeader'] || undefined
     });
@@ -59,34 +66,36 @@ async function go()
   }
 
   // Generate Java sources if specified.
-  const javaBaseDir = parsedArgs['javaBaseDir'];
-  if ( javaBaseDir )
+  if ( javaQueriesOutputDir )
   {
-    const javaQueriesPackage = parsedArgs['javaQueriesPkg'];
-    const javaQueriesOutputDir = `${javaBaseDir}/${replaceAll(javaQueriesPackage, '.','/')}`;
+    if ( !javaBaseDir )
+      throw new Error('javaBaseDir is required for Java source generation');
 
     await fs.mkdir(javaQueriesOutputDir, {recursive: true});
 
     console.log(`Writing Java query source files to ${javaQueriesOutputDir}.`);
 
-    await generateQuerySources(queryGroupSpec, dbmdPath, javaQueriesOutputDir, null, {
+    await generateQuerySources(queryGroupSpec, dbmdPath, javaQueriesOutputDir, sqlOutputDir, {
       sourceLanguage: 'Java',
       javaPackage: javaQueriesPackage,
       typesHeaderFile: parsedArgs['javaTypesHeader']
     });
+  }
 
-    // Write Java relation metadatas if specified.
-    const javaRelMdsPackage = parsedArgs['javaRelMdsPkg'];
-    if ( javaRelMdsPackage )
-    {
-      const javaRelMdsOutputDir = `${javaBaseDir}/${replaceAll(javaRelMdsPackage, '.','/')}`;
+  // Write Java relation metadatas if specified.
+  const javaRelMdsPackage = parsedArgs['javaRelMdsPkg'];
+  if ( javaRelMdsPackage )
+  {
+    if ( !javaBaseDir )
+      throw new Error('javaBaseDir is required for Java source generation');
 
-      await fs.mkdir(javaRelMdsOutputDir, {recursive: true});
+    const javaRelMdsOutputDir = `${javaBaseDir}/${replaceAll(javaRelMdsPackage, '.','/')}`;
 
-      console.log(`Writing Java relations metadata file to ${javaRelMdsOutputDir}.`);
+    await fs.mkdir(javaRelMdsOutputDir, {recursive: true});
 
-      await generateRelationsMetadataSource(dbmdPath, javaRelMdsOutputDir, 'Java', javaRelMdsPackage);
-    }
+    console.log(`Writing Java relations metadata file to ${javaRelMdsOutputDir}.`);
+
+    await generateRelationsMetadataSource(dbmdPath, javaRelMdsOutputDir, 'Java', javaRelMdsPackage);
   }
 }
 
