@@ -13,10 +13,8 @@ import {queryGroupSpec} from './queries/query-specs';
 
 async function generateQueries(parsedArgs: minimist.ParsedArgs)
 {
-  const dbmdPath = path.join(__dirname, 'dbmd', 'dbmd.json');
-  console.log(`Using database metadata from ${dbmdPath}.`);
-
   // Generate SQL source files if specified.
+  const dbmdPath = parsedArgs['dbmd'] || path.join(__dirname, 'dbmd', 'dbmd.json');
   const sqlOutputDir = parsedArgs['sqlDir'];
   const tsQueriesOutputDir = parsedArgs['tsQueriesDir'];
   const javaBaseDir = parsedArgs['javaBaseDir'];
@@ -94,6 +92,7 @@ async function generateQueries(parsedArgs: minimist.ParsedArgs)
 }
 
 const optionNames = [
+  'dbmd', // database metadata json file path
   'sqlDir',
   'sqlResourcePath',
   'tsQueriesDir', 'tsRelMdsDir', 'tsTypesHeader',

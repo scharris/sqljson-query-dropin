@@ -24,7 +24,7 @@ instructions.
     Add a script or manually-triggered step to your build process to perform the following whenever
     database metadata needs to be updated to reflect changes in the database:
     ```
-    mvn -f query-gen/dbmd/pom.xml compile exec:java "-DjdbcProps=<jdbc-props-file>" "-Ddb=<pg|ora>"
+    mvn -f query-gen/dbmd/pom.xml compile exec:java -DjdbcProps=<jdbc-props-file> -Ddb=<pg|ora>
     ```
   
     Here `<jdbc-props-file>` is the path to a properties file with JDBC connection information for
