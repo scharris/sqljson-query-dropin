@@ -12,7 +12,7 @@ relationMetadatasQuery as (
           cast(coalesce(json_arrayagg(json_object(
             'name', col.column_name,
             'databaseType', col.data_type,
-            'nullable', case col.is_nullable when 'NO' then false when 'YES' then true end,
+            'nullable', case col.is_nullable when 'NO' then cast(false as json) when 'YES' then cast(true as json) end,
             'primaryKeyPartNumber', (
               select kcu.ordinal_position
               from information_schema.key_column_usage kcu
