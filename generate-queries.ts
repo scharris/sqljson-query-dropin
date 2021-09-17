@@ -14,12 +14,19 @@ import {queryGroupSpec} from './queries/query-specs';
 async function generateQueries(parsedArgs: minimist.ParsedArgs)
 {
   // Generate SQL source files if specified.
-  const dbmdPath = parsedArgs['dbmd'] || path.join(__dirname, 'dbmd', 'dbmd.json');
+  const internalDbmdDir = path.join(__dirname, 'dbmd');
+  const dbmdPath = parsedArgs['dbmd'] || path.join(internalDbmdDir, 'dbmd.json');
   const sqlOutputDir = parsedArgs['sqlDir'];
   const tsQueriesOutputDir = parsedArgs['tsQueriesDir'];
   const javaBaseDir = parsedArgs['javaBaseDir'];
   const javaQueriesPackage = parsedArgs['javaQueriesPkg'];
   const javaQueriesOutputDir = javaBaseDir ? `${javaBaseDir}/${replaceAll(javaQueriesPackage, '.','/')}` : null;
+
+  if ( !(sqlOutputDir || tsQueriesOutputDir || javaQueriesOutputDir) )
+    throw new Error('No query-related outputs were specified - one or more of "sqlDir", "tsQueriesDir", "javaBaseDir"+"javaQueriesPkg" are required');
+
+  // Always write an internal copy of the TS relations metadata into the internal dbmd directory, for usage in query specs.
+  await generateRelationsMetadataSource(dbmdPath, internalDbmdDir, 'TS');
 
   // Only generate SQL here if it's not being generated with Java or TS source code below.
   // The Java/TS source generators need to generate the SQL when they are enabled, so that they can
