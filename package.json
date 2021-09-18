@@ -5,8 +5,10 @@
    "description": "Generate SQL queries and TypeScript result types for enclosing app.",
    "repository": {},
    "scripts": {
-      "pregenerate-queries": "tsc",
-      "generate-queries": "node generate-queries.js"
+      "pregenerate-queries": "npm run generate-relations-metadata && tsc generate-queries.ts",
+      "generate-queries": "node generate-queries.js",
+      "pregenerate-relations-metadata": "tsc generate-relations-metadata.ts",
+      "generate-relations-metadata": "node generate-relations-metadata.js"
    },
    "devDependencies": {
       "@types/minimist": "^1.2.1",
