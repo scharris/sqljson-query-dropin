@@ -11,34 +11,34 @@ async function generateRelationsMetadata(parsedArgs: minimist.ParsedArgs)
   // Generate SQL source files if specified.
   const internalDbmdDir = path.join(__dirname, 'dbmd');
   const dbmdPath = parsedArgs['dbmd'] || path.join(internalDbmdDir, 'dbmd.json');
-  const tsRelMdsOutputDir = parsedArgs['tsRelMdsDir'];
+  const tsRelsMdOutputDir = parsedArgs['tsRelsMdDir'] || parsedArgs['tsRelMdsDir'];;
   const javaBaseDir = parsedArgs['javaBaseDir'];
-  const javaRelMdsPackage = parsedArgs['javaRelMdsPkg'];
+  const javaRelsMdPackage = parsedArgs['javaRelsMdPkg'] || parsedArgs['javaRelMdsPkg'];
 
-  if ( tsRelMdsOutputDir )
+  if ( tsRelsMdOutputDir )
   {
-    console.log(`Writing TS relation metadatas source file to ${tsRelMdsOutputDir}.`);
+    console.log(`Writing TS relation metadatas source file to ${tsRelsMdOutputDir}.`);
 
-    await generateRelationsMetadataSource(dbmdPath, tsRelMdsOutputDir, 'TS');
+    await generateRelationsMetadataSource(dbmdPath, tsRelsMdOutputDir, 'TS');
   }
 
   // Write Java relation metadatas if specified.
-  if ( javaRelMdsPackage )
+  if ( javaRelsMdPackage )
   {
     if ( !javaBaseDir )
       throw new Error('javaBaseDir is required for Java source generation');
 
-    const javaRelMdsOutputDir = `${javaBaseDir}/${replaceAll(javaRelMdsPackage, '.','/')}`;
+    const javaRelsMdOutputDir = `${javaBaseDir}/${replaceAll(javaRelsMdPackage, '.','/')}`;
 
-    await fs.mkdir(javaRelMdsOutputDir, {recursive: true});
+    await fs.mkdir(javaRelsMdOutputDir, {recursive: true});
 
-    console.log(`Writing Java relations metadata file to ${javaRelMdsOutputDir}.`);
+    console.log(`Writing Java relations metadata file to ${javaRelsMdOutputDir}.`);
 
-    await generateRelationsMetadataSource(dbmdPath, javaRelMdsOutputDir, 'Java', javaRelMdsPackage);
+    await generateRelationsMetadataSource(dbmdPath, javaRelsMdOutputDir, 'Java', javaRelsMdPackage);
   }
 
   // If no other outputs were specified, write TS rel mds to the internal dbmd directory.
-  if ( !tsRelMdsOutputDir && !javaRelMdsPackage )
+  if ( !tsRelsMdOutputDir && !javaRelsMdPackage )
   {
     await generateRelationsMetadataSource(dbmdPath, internalDbmdDir, 'TS');
   }
@@ -46,8 +46,8 @@ async function generateRelationsMetadata(parsedArgs: minimist.ParsedArgs)
 
 const optionNames = [
   'dbmd', // database metadata json file path
-  'tsRelMdsDir',
-  'javaRelMdsPkg',
+  'tsRelsMdDir', 'tsRelMdsDir',     // equiv params, former name preferred
+  'javaRelsMdPkg', 'javaRelMdsPkg', // "
   'javaBaseDir'
 ];
 
