@@ -60,9 +60,14 @@ if ( typeof parsedArgs === 'string' ) // arg parsing error
 }
 else
 {
-  generateRelationsMetadata(parsedArgs).then(() => {
-    console.log("Query generation completed.");
+  generateRelationsMetadata(parsedArgs)
+  .then(() => console.log("Generation of relations metadata completed."))
+  .catch((e) => {
+    console.error(e);
+    console.error("Generation of relations metadata failed due to error - see error detail above.");
+    process.exit(1);
   });
+  ;
 }
 
 function parseArgs
