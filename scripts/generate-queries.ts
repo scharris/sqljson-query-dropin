@@ -9,7 +9,7 @@ import * as path from 'path';
 import {promises as fs} from 'fs';
 import {generateQuerySources} from 'sqljson-query';
 
-import {queryGroupSpec} from './queries/query-specs';
+import {queryGroupSpec} from '../query-specs';
 
 async function generateQueries(parsedArgs: minimist.ParsedArgs)
 {
