@@ -27,9 +27,9 @@ async function generateDatabaseMetadata(parsedArgs: minimist.ParsedArgs)
 
   if (mvnProc.status !== 0)
   {
-    console.error('Maven command failed:');
+    console.error('Maven command to generate database metadata failed:');
     console.error(mvnProc);
-    throw new Error('Database generation failed.');
+    throw new Error('Database metadata generation failed.');
   }
 
   await generateRelationsMetadata({ dbmd: dbmdPath, tsRelsMdDir: internalDbmdDir, _: [] });
