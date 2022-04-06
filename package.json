@@ -1,20 +1,21 @@
 {
-   "name": "query-sources-generator",
-   "version": "1.2.0",
-   "license": "MIT",
-   "description": "Generate SQL queries and TypeScript result types for enclosing app.",
-   "repository": {},
-   "scripts": {
-      "compile": "tsc **/*.ts"
-   },
-   "devDependencies": {
-      "@types/minimist": "^1.2.1",
-      "@types/node": "^14.18.0",
-      "copyfiles": "^2.4.1",
-      "typescript": "^4.5.2"
-   },
-   "dependencies": {
-      "minimist": "^1.2.5",
-      "sqljson-query": "1.7.2"
-   }
+  "name": "query-sources-generator",
+  "version": "1.3.0",
+  "license": "MIT",
+  "description": "Generate database metadata, SQL queries, and TypeScript and Java result type sources.",
+  "repository": {},
+  "scripts": {
+    "gen-dbmd": "gen-dbmd --jdbcProps ./db/jdbc.props --db pg --outputDir .",
+    "pregen-queries": "tsc -b .",
+    "gen-queries": "node gen-queries.js --dbmd dbmd.json --sqlDir ./generated/sql --tsQueriesDir ./generated/lib --propsMdDir ./generated/lib"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.1",
+    "@types/node": "^14.18.0",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5",
+    "sqljson-query": "1.7.9"
+  }
 }
