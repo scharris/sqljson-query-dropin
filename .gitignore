@@ -3,4 +3,5 @@
 node_modules
 *.iml
 .idea
-query-specs.ts
+.vscode
+package-lock.json

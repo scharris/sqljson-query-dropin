@@ -7,7 +7,7 @@
   "scripts": {
     "gen-dbmd": "gen-dbmd --jdbcProps ./db/jdbc.props --db pg --outputDir .",
     "pregen-queries": "tsc -b .",
-    "gen-queries": "node gen-queries.js --dbmd dbmd.json --sqlDir sql --tsQueriesDir ts --propsMdDir"
+    "gen-queries": "node gen-queries.js --dbmd dbmd.json --sqlDir sql --tsDir ts"
   },
   "devDependencies": {
     "@types/minimist": "^1.2.1",
@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "minimist": "^1.2.5",
-    "sqljson-query": "1.7.9"
+    "sqljson-query": "1.7.10"
   }
 }
