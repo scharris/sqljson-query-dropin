@@ -1,11 +1,11 @@
 {
   "name": "query-sources-generator",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "license": "MIT",
   "description": "Generate database metadata, SQL queries, and TypeScript and Java result type sources.",
   "repository": {},
   "scripts": {
-    "gen-dbmd": "gen-dbmd --jdbcProps ./db/jdbc.props --db pg --outputDir .",
+    "gen-dbmd": "gen-dbmd --jdbcProps ./db/conn.props --db pg --outputDir .",
     "pregen-queries": "tsc -b .",
     "gen-queries": "node gen-queries.js --dbmd dbmd.json --sqlDir sql --tsDir ts"
   },
@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "minimist": "^1.2.5",
-    "sqljson-query": "1.7.10"
+    "sqljson-query": "1.7.11"
   }
 }
