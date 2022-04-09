@@ -5,7 +5,7 @@
   "description": "Generate database metadata, SQL queries, and TypeScript and Java result type sources.",
   "repository": {},
   "scripts": {
-    "gen-dbmd": "gen-dbmd --jdbcProps ./db/conn.props --db pg --outputDir .",
+    "gen-dbmd": "gen-dbmd --connProps ./db/conn.props --db pg --outputDir .",
     "pregen-queries": "tsc -b .",
     "gen-queries": "node gen-queries.js --dbmd dbmd.json --sqlDir sql --tsDir ts"
   },
@@ -15,7 +15,6 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
-    "minimist": "^1.2.5",
     "sqljson-query": "1.7.12"
   }
 }
