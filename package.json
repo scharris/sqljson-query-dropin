@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "minimist": "^1.2.5",
-    "sqljson-query": "1.7.11"
+    "sqljson-query": "1.7.12"
   }
 }
